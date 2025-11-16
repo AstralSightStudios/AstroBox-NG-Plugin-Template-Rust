@@ -3,7 +3,7 @@ use wit_bindgen::FutureReader;
 use crate::{
     astrobox::psys_host::{
         self,
-        ui::{DialogButton, DialogInfo},
+        dialog::{DialogButton, DialogInfo},
     },
     exports::astrobox::psys_plugin::{
         event::{self, EventType},
@@ -43,6 +43,20 @@ impl event::Guest for MyPlugin {
 
         reader
     }
+
+    fn on_ui_event(
+        _event_id: _rt::String,
+        _event: event::Event,
+        _event_payload: _rt::String,
+    ) -> wit_bindgen::rt::async_support::FutureReader<_rt::String> {
+        let (writer, reader) = wit_future::new::<String>(|| "".to_string());
+
+        wit_bindgen::spawn(async move {
+            let _ = writer.write("".to_string()).await;
+        });
+
+        reader
+    }
 }
 
 impl lifecycle::Guest for MyPlugin {
@@ -53,9 +67,9 @@ impl lifecycle::Guest for MyPlugin {
         tracing::info!("Hello AstroBox V2 Plugin!");
 
         wit_bindgen::block_on(async {
-            let _ret = psys_host::ui::show_dialog(
-                psys_host::ui::DialogType::Alert,
-                psys_host::ui::DialogStyle::System,
+            let _ret = psys_host::dialog::show_dialog(
+                psys_host::dialog::DialogType::Alert,
+                psys_host::dialog::DialogStyle::System,
                 &DialogInfo {
                     title: "Plugin Alert".to_string(),
                     content: "该插件正在AstroBox V2的全新WASI插件系统上运行！".to_string(),
