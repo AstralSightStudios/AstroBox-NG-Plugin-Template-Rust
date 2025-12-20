@@ -7,7 +7,7 @@ use crate::{
     },
     exports::astrobox::psys_plugin::{
         event::{self, EventType},
-        lifecycle, ui,
+        lifecycle,
     },
 };
 
@@ -82,18 +82,6 @@ impl lifecycle::Guest for MyPlugin {
             )
             .await;
         });
-    }
-}
-
-impl ui::Guest for MyPlugin {
-    fn render_settings_ui() -> FutureReader<String> {
-        let (writer, reader) = wit_future::new::<String>(|| "".to_string());
-
-        wit_bindgen::spawn(async move {
-            let _ = writer.write("".to_string()).await;
-        });
-
-        reader
     }
 }
 
