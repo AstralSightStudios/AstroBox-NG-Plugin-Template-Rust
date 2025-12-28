@@ -1,10 +1,6 @@
 use wit_bindgen::FutureReader;
 
 use crate::{
-    astrobox::psys_host::{
-        self,
-        dialog::{DialogButton, DialogInfo},
-    },
     exports::astrobox::psys_plugin::{
         event::{self, EventType},
         lifecycle,
@@ -63,25 +59,7 @@ impl lifecycle::Guest for MyPlugin {
     #[allow(async_fn_in_trait)]
     fn on_load() -> () {
         logger::init();
-
         tracing::info!("Hello AstroBox V2 Plugin!");
-
-        wit_bindgen::block_on(async {
-            let _ret = psys_host::dialog::show_dialog(
-                psys_host::dialog::DialogType::Alert,
-                psys_host::dialog::DialogStyle::System,
-                &DialogInfo {
-                    title: "Plugin Alert".to_string(),
-                    content: "该插件正在AstroBox V2的全新WASI插件系统上运行！".to_string(),
-                    buttons: vec![DialogButton {
-                        id: "1".to_string(),
-                        primary: true,
-                        content: "OK".to_string(),
-                    }],
-                },
-            )
-            .await;
-        });
     }
 }
 
