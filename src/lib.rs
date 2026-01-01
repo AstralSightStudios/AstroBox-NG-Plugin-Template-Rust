@@ -1,10 +1,8 @@
 use wit_bindgen::FutureReader;
 
-use crate::{
-    exports::astrobox::psys_plugin::{
-        event::{self, EventType},
-        lifecycle,
-    },
+use crate::exports::astrobox::psys_plugin::{
+    event::{self, EventType},
+    lifecycle,
 };
 
 pub mod logger;
@@ -49,6 +47,26 @@ impl event::Guest for MyPlugin {
 
         wit_bindgen::spawn(async move {
             let _ = writer.write("".to_string()).await;
+        });
+
+        reader
+    }
+
+    fn on_ui_render(_element_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
+        let (writer, reader) = wit_future::new::<()>(|| ());
+
+        wit_bindgen::spawn(async move {
+            let _ = writer.write(()).await;
+        });
+
+        reader
+    }
+
+    fn on_card_render(_card_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
+        let (writer, reader) = wit_future::new::<()>(|| ());
+
+        wit_bindgen::spawn(async move {
+            let _ = writer.write(()).await;
         });
 
         reader
