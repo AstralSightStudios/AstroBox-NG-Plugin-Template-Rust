@@ -6,6 +6,8 @@ use crate::exports::astrobox::psys_plugin::{
 };
 
 pub mod logger;
+pub mod ui;
+pub mod resources;
 
 wit_bindgen::generate!({
     path: "wit",
@@ -52,10 +54,15 @@ impl event::Guest for MyPlugin {
         reader
     }
 
-    fn on_ui_render(_element_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
+    fn on_ui_render(element_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
         let (writer, reader) = wit_future::new::<()>(|| ());
 
+        tracing::info!("Rendering main UI: {}", element_id);
+        ui::render_main_ui(&element_id);
+        tracing::info!("Main UI rendered");
+
         wit_bindgen::spawn(async move {
+            tracing::info!("on_ui_render spawn");
             let _ = writer.write(()).await;
         });
 
