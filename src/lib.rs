@@ -41,11 +41,13 @@ impl event::Guest for MyPlugin {
     }
 
     fn on_ui_event(
-        _event_id: _rt::String,
-        _event: event::Event,
+        event_id: _rt::String,
+        event: event::Event,
         _event_payload: _rt::String,
     ) -> wit_bindgen::rt::async_support::FutureReader<_rt::String> {
         let (writer, reader) = wit_future::new::<String>(|| "".to_string());
+
+        ui::ui_event_processor(event, &event_id);
 
         wit_bindgen::spawn(async move {
             let _ = writer.write("".to_string()).await;
@@ -57,12 +59,9 @@ impl event::Guest for MyPlugin {
     fn on_ui_render(element_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
         let (writer, reader) = wit_future::new::<()>(|| ());
 
-        tracing::info!("Rendering main UI: {}", element_id);
         ui::render_main_ui(&element_id);
-        tracing::info!("Main UI rendered");
 
         wit_bindgen::spawn(async move {
-            tracing::info!("on_ui_render spawn");
             let _ = writer.write(()).await;
         });
 
