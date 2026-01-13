@@ -21,24 +21,22 @@ fn ui_state() -> &'static Mutex<UiState> {
 
 pub fn ui_event_processor(evtype: ui::Event, event: &str) {
     match evtype {
-        ui::Event::Click => {
-            match event {
-                EXAMPLE_BUTTON_CLICK_EVENT => {
-                    let (root_element_id, click_count) = {
-                        let mut state = ui_state()
-                            .lock()
-                            .unwrap_or_else(|poisoned| poisoned.into_inner());
-                        state.click_count = state.click_count.saturating_add(1);
-                        (state.root_element_id.clone(), state.click_count)
-                    };
+        ui::Event::Click => match event {
+            EXAMPLE_BUTTON_CLICK_EVENT => {
+                let (root_element_id, click_count) = {
+                    let mut state = ui_state()
+                        .lock()
+                        .unwrap_or_else(|poisoned| poisoned.into_inner());
+                    state.click_count = state.click_count.saturating_add(1);
+                    (state.root_element_id.clone(), state.click_count)
+                };
 
-                    if let Some(root_element_id) = root_element_id {
-                        psys_host::ui::render(&root_element_id, build_main_ui(click_count));
-                    }
+                if let Some(root_element_id) = root_element_id {
+                    psys_host::ui::render(&root_element_id, build_main_ui(click_count));
                 }
-                _ => {}
             }
-        }
+            _ => {}
+        },
         _ => {}
     }
 }
@@ -62,11 +60,13 @@ pub fn build_main_ui(click_count: usize) -> ui::Element {
     } else {
         format!("干嘛...还点... ({})", click_count)
     };
-    let example_text = ui::Element::new(
-        ui::ElementType::P,
-        Some(example_text_content.as_str()),
-    )
-    .size(26);
+    let example_text =
+        ui::Element::new(ui::ElementType::P, Some(example_text_content.as_str())).size(26);
+
+    let example_select = ui::Element::new(ui::ElementType::Select, None)
+        .child(ui::Element::new(ui::ElementType::Option, Some("电棍")))
+        .child(ui::Element::new(ui::ElementType::Option, Some("炫狗")))
+        .child(ui::Element::new(ui::ElementType::Option, Some("叮咚鸡")));
 
     ui::Element::new(ui::ElementType::Div, None)
         .flex()
@@ -77,6 +77,7 @@ pub fn build_main_ui(click_count: usize) -> ui::Element {
         .child(example_img)
         .child(example_text)
         .child(example_button)
+        .child(example_select)
 }
 
 pub fn render_main_ui(element_id: &str) {
