@@ -1,4 +1,4 @@
-use crate::astrobox::psys_host::{self, ui};
+use astrobox_ng_wit::astrobox::psys_host::{self, ui};
 use std::sync::{Mutex, OnceLock};
 
 pub const EXAMPLE_BUTTON_CLICK_EVENT: &str = "example_button_click";

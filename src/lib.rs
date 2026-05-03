@@ -1,6 +1,6 @@
-use wit_bindgen::FutureReader;
+use astrobox_ng_wit::FutureReader;
 
-use crate::exports::astrobox::psys_plugin::{
+use astrobox_ng_wit::exports::astrobox::psys_plugin::{
     event::{self, EventType},
     lifecycle,
 };
@@ -9,18 +9,12 @@ pub mod logger;
 pub mod ui;
 pub mod resources;
 
-wit_bindgen::generate!({
-    path: "wit",
-    world: "psys-world",
-    generate_all,
-});
-
 struct MyPlugin;
 
 impl event::Guest for MyPlugin {
     #[allow(async_fn_in_trait)]
-    fn on_event(event_type: EventType, event_payload: _rt::String) -> FutureReader<String> {
-        let (writer, reader) = wit_future::new::<String>(|| "".to_string());
+    fn on_event(event_type: EventType, event_payload: String) -> FutureReader<String> {
+        let (writer, reader) = astrobox_ng_wit::wit_future::new::<String>(|| "".to_string());
 
         match event_type {
             EventType::PluginMessage => {}
@@ -34,7 +28,7 @@ impl event::Guest for MyPlugin {
 
         tracing::info!("event_payload: {}", event_payload);
 
-        wit_bindgen::spawn(async move {
+        astrobox_ng_wit::spawn(async move {
             let _ = writer.write("".to_string()).await;
         });
 
@@ -42,37 +36,37 @@ impl event::Guest for MyPlugin {
     }
 
     fn on_ui_event(
-        event_id: _rt::String,
+        event_id: String,
         event: event::Event,
-        _event_payload: _rt::String,
-    ) -> wit_bindgen::rt::async_support::FutureReader<_rt::String> {
-        let (writer, reader) = wit_future::new::<String>(|| "".to_string());
+        _event_payload: String,
+    ) -> astrobox_ng_wit::FutureReader<String> {
+        let (writer, reader) = astrobox_ng_wit::wit_future::new::<String>(|| "".to_string());
 
         ui::ui_event_processor(event, &event_id);
 
-        wit_bindgen::spawn(async move {
+        astrobox_ng_wit::spawn(async move {
             let _ = writer.write("".to_string()).await;
         });
 
         reader
     }
 
-    fn on_ui_render(element_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
-        let (writer, reader) = wit_future::new::<()>(|| ());
+    fn on_ui_render(element_id: String) -> astrobox_ng_wit::FutureReader<()> {
+        let (writer, reader) = astrobox_ng_wit::wit_future::new::<()>(|| ());
 
         ui::render_main_ui(&element_id);
 
-        wit_bindgen::spawn(async move {
+        astrobox_ng_wit::spawn(async move {
             let _ = writer.write(()).await;
         });
 
         reader
     }
 
-    fn on_card_render(_card_id: _rt::String) -> wit_bindgen::rt::async_support::FutureReader<()> {
-        let (writer, reader) = wit_future::new::<()>(|| ());
+    fn on_card_render(_card_id: String) -> astrobox_ng_wit::FutureReader<()> {
+        let (writer, reader) = astrobox_ng_wit::wit_future::new::<()>(|| ());
 
-        wit_bindgen::spawn(async move {
+        astrobox_ng_wit::spawn(async move {
             let _ = writer.write(()).await;
         });
 
@@ -88,4 +82,4 @@ impl lifecycle::Guest for MyPlugin {
     }
 }
 
-export!(MyPlugin);
+astrobox_ng_wit::export!(MyPlugin);
